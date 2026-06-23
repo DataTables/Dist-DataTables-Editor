@@ -1,0 +1,15 @@
+{
+    "js": [
+        "js/dataTables.editor.js",
+        "js/dataTables.editor.min.js",
+        "js/dataTables.editor.min.mjs",
+        "js/dataTables.editor.mjs"
+    ],
+    "css": [],
+    "types": [
+        "types/types.d.ts"
+    ],
+    "src-repo": "http://github.com/DataTables/Editor",
+    "last-tag": "2.5.2",
+    "last-sync": ""
+}

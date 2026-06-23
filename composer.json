@@ -1,0 +1,31 @@
+{
+    "name": "datatables.net/datatables.net-editor",
+    "description": "Editor is a comprehensive editing extension for DataTables that provides the ability to easily add, edit and delete rows on a database that is displayed by a DataTable. Editor provides a clean and responsive interface for end user manipulation of data, an expressive API for complete control and a well defined server communications protocol for data submission. This is Editor for DataTables",
+    "support": {
+        "forum": "https://datatables.net/forums"
+    },
+    "homepage": "https://www.datatables.net/",
+    "authors": [
+        {
+            "name": "SpryMedia",
+            "homepage": "https://datatables.net"
+        }
+    ],
+    "license": [
+        "SEE LICENSE IN License.txt"
+    ],
+    "prefer-stable": true,
+    "minimum-stability": "dev",
+    "keywords": [
+        "Editing",
+        "CRUD",
+        "Inline",
+        "Modal",
+        "Multi-row",
+        "Datatables",
+        "table"
+    ],
+    "require": {
+        "datatables.net/datatables.net": "3.0.0-0"
+    }
+}

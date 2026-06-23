@@ -1,0 +1,34 @@
+{
+    "name": "datatables.net-editor",
+    "description": "Editor for DataTables",
+    "main": "js/dataTables.editor.js",
+    "module": "js/dataTables.editor.mjs",
+    "types": "./types/types.d.ts",
+    "version": "3.0.0-beta.1",
+    "files": [
+        "js/**/*.js",
+        "js/**/*.mjs",
+        "types/**/*.d.ts"
+    ],
+    "keywords": [
+        "Editing",
+        "CRUD",
+        "Inline",
+        "Modal",
+        "Multi-row",
+        "Datatables",
+        "table",
+        "filter",
+        "sort"
+    ],
+    "dependencies": {
+        "datatables.net": "3.0.0-0"
+    },
+    "author": {
+        "name": "SpryMedia Ltd",
+        "url": "http://datatables.net"
+    },
+    "homepage": "https://datatables.net",
+    "bugs": "https://datatables.net/forums",
+    "license": "SEE LICENSE IN License.txt"
+}
