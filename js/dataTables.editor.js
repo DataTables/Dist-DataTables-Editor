@@ -3985,7 +3985,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-06-23', 'editor');
+    DataTable.plus('2026-06-25', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -5287,7 +5287,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('__BUILD_DATE__', 'editor');
+    DataTable.plus('2026-06-25', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6182,7 +6182,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('__BUILD_DATE__', 'editor');
+    DataTable.plus('2026-06-25', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
@@ -7631,55 +7631,39 @@ class Editor {
             i18n: init.i18n,
             idSrc: init.idSrc,
             table: init.domTable || init.table,
-            template: init.template ? Dom.s(init.template).detach() : null
+            template: null
         });
         this.classes = util.object.assignDeep({}, Editor.classes);
+        // Template import
+        if (init.template) {
+            let template = Dom.s(init.template);
+            this.s.template =
+                template[0].nodeName.toLowerCase() === 'template'
+                    ? Dom.s(document.importNode(template[0].content, true)).children()
+                    : template.detach();
+        }
         // Increment the unique counter for the next instance
         Editor.models.settings.unique++;
         let that = this;
         let classes = this.classes;
         this.dom = {
-            body: Dom
-                .c('div')
-                .classAdd(classes.body.wrapper)
-                .get(0),
-            bodyContent: Dom
-                .c('div')
-                .classAdd(classes.body.content)
-                .get(0),
-            buttons: Dom
-                .c('div')
-                .classAdd(classes.form.buttons)
-                .get(0),
+            body: Dom.c('div').classAdd(classes.body.wrapper).get(0),
+            bodyContent: Dom.c('div').classAdd(classes.body.content).get(0),
+            buttons: Dom.c('div').classAdd(classes.form.buttons).get(0),
             event: Dom.c('div'),
-            footer: Dom
-                .c('div')
+            footer: Dom.c('div')
                 .classAdd(classes.footer.wrapper)
                 .append(Dom.c('div').classAdd(classes.footer.content))
                 .get(0),
-            form: Dom
-                .c('form')
-                .classAdd(classes.form.tag)
-                .get(0),
-            formContent: Dom
-                .c('div')
-                .classAdd(classes.form.content)
-                .get(0),
-            formError: Dom
-                .c('div')
-                .classAdd(classes.form.error)
-                .get(0),
-            formInfo: Dom
-                .c('div')
-                .classAdd(classes.form.info)
-                .get(0),
-            header: Dom
-                .c('div')
+            form: Dom.c('form').classAdd(classes.form.tag).get(0),
+            formContent: Dom.c('div').classAdd(classes.form.content).get(0),
+            formError: Dom.c('div').classAdd(classes.form.error).get(0),
+            formInfo: Dom.c('div').classAdd(classes.form.info).get(0),
+            header: Dom.c('div')
                 .classAdd(classes.header.wrapper)
                 .append(Dom.c('div').classAdd(classes.header.content))
                 .get(0),
-            processing: Dom
-                .c('div')
+            processing: Dom.c('div')
                 .classAdd(classes.processing.indicator)
                 .append(Dom.c('span'))
                 .get(0),
