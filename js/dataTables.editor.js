@@ -3985,7 +3985,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-07-14', 'editor');
+    DataTable.plus('2026-07-15', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -5287,7 +5287,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-07-14', 'editor');
+    DataTable.plus('2026-07-15', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6182,7 +6182,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('2026-07-14', 'editor');
+    DataTable.plus('2026-07-15', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
