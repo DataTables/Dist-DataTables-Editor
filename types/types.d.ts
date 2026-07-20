@@ -525,6 +525,9 @@ interface IEditorOptions {
      * Firebase or route the data through a web-socket.
      */
     ajax: string | any;
+    /**
+     * Control where Editor will get the data to edit.
+     */
     dataSrc: 'table' | 'ajax' | 'html';
     /**
      * The display controller for the form. The form itself is just a collection
