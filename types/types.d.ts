@@ -2764,6 +2764,14 @@ declare module 'datatables.net' {
          */
         editor?: ConfigEditorLanguage;
     }
+    interface ColumnOptions {
+        /**
+         * The field name(s) that the cells in this column uses for editing.
+         * Typically used for join fields where the name and the data source
+         * name are different.
+         */
+        editField?: string | string[];
+    }
     interface Context {
         _editor: Editor;
     }
