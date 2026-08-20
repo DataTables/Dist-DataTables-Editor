@@ -1725,7 +1725,7 @@ declare function val(this: Editor, fieldIn: string, values: {
  * @param  {string} msg Error message
  * @param  {int}    tn  Tech note link
  */
-declare function error(msg: string, tn: number, thro?: boolean): void;
+declare function error(msg: string, tn: number, thro?: boolean | 'alert'): void;
 /**
  * Obtain label / value pairs of data from a data source, be it an array or
  * object, for use in an input that requires label / value pairs such as

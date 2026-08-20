@@ -608,6 +608,9 @@ function error$1(msg, tn, thro = true) {
     if (thro) {
         throw display;
     }
+    else if (thro === 'alert') {
+        alert(display);
+    }
     else {
         console.warn(display);
     }
@@ -6143,7 +6146,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let changedSubmit = opts.submit;
     let submitParamsLocal;
     if (!DataTable.plus('2026-08-20', 'editor')) {
-        error$1('To use Editor, please purchase a license, or use a trial', 24, false);
+        error$1('To save using Editor, please set a license key', 24, 'alert');
         return;
     }
     // First - are any of the fields currently "processing"? If so, then we
