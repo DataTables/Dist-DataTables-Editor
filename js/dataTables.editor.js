@@ -44,6 +44,36 @@
 var Dom = DataTable.Dom;
 var util = DataTable.util;
 
+/**
+ * Unwrap a reference from React, Vue, Angular, or just a plain value.
+ *
+ * @param val The value to check if it is a reference.
+ * @returns
+ */
+function unwrap(val) {
+    // Allow functions for dynamic resolution
+    if (typeof val === 'function') {
+        return val();
+    }
+    // Unwrap references
+    if (typeof val === 'object') {
+        // React refs: { current: instance }
+        if ('current' in val) {
+            return val.current;
+        }
+        // Vue 3 refs / Preact Signals: { value: instance }
+        if ('value' in val) {
+            return val.value;
+        }
+        // Angular ViewChild refs: { nativeElement: instance }
+        if ('nativeElement' in val) {
+            return val.nativeElement;
+        }
+    }
+    // The standard approach
+    return val;
+}
+
 class DropDown {
     constructor(host, options) {
         this.s = {
@@ -4141,7 +4171,7 @@ function submit(successCallback, errorCallback, formatdata, hideIn) {
 }
 function table(setIn) {
     if (setIn === undefined) {
-        return this.s.table;
+        return unwrap(this.s.table);
     }
     this.s.table = setIn;
     return this;
@@ -4160,7 +4190,7 @@ function title(titleIn) {
         return this.s.title;
     }
     if (typeof titleIn === 'function') {
-        titleIn = titleIn(this, new DataTable.Api(this.s.table));
+        titleIn = titleIn(this, new DataTable.Api(unwrap(this.s.table)));
     }
     this.s.title = titleIn;
     this._drawTitle();
@@ -4270,9 +4300,10 @@ let _dtIsSsp = function (dt, editor) {
         editor.s.editOpts.drawType !== 'none';
 };
 let _dtApi = function (table) {
-    return table instanceof DataTable.Api
-        ? table
-        : new DataTable.Api(table);
+    let t = unwrap(table);
+    return t instanceof DataTable.Api
+        ? t
+        : new DataTable.Api(t);
 };
 // Highlight a row using CSS transitions. The timeouts need to match the
 // transition duration from the CSS
@@ -5880,7 +5911,7 @@ function _message(elIn, msg, title, fn) {
         fn = function () { };
     }
     if (typeof msg === 'function') {
-        msg = msg(this, new DataTable.Api(this.s.table));
+        msg = msg(this, new DataTable.Api(unwrap(this.s.table)));
     }
     let el = Dom.s(elIn);
     if (!msg) {
@@ -6529,9 +6560,9 @@ function _submitError(xhr, err, thrown, errorCallback, submitParams, action) {
  * @private
  */
 function _tidy(fn) {
-    let dt = this.s.table ? new DataTable.Api(this.s.table) : null;
+    let dt = this.s.table ? new DataTable.Api(unwrap(this.s.table)) : null;
     let ssp = false;
-    if (dt) {
+    if (dt && dt.context.length) {
         ssp = dt.settings()[0].features.serverSide;
     }
     if (this.s.processing) {
@@ -6655,7 +6686,8 @@ function getEls$1() {
     return _domEls$1;
 }
 function findAttachRow(editor, attach) {
-    let dt = new DataTable.Api(editor.s.table);
+    let table = unwrap(editor.s.table);
+    let dt = new DataTable.Api(table);
     // Figure out where we want to put the form display
     if (attach === 'head') {
         return dt.table(undefined).header(); // typing error in DT type file
@@ -7377,11 +7409,6 @@ apiRegister('file()', file);
 apiRegister('files()', files);
 
 const buttons = DataTable.ext.buttons;
-function resolveInst(config) {
-    return typeof config.editor === 'function'
-        ? config.editor()
-        : config.editor;
-}
 /*
  * Add helpful buttons to make life easier
  *
@@ -7392,7 +7419,7 @@ function resolveInst(config) {
 buttons.create = {
     action(e, dt, node, config) {
         let that = this;
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         this.processing(true);
         editor
             .one('preOpen', function () {
@@ -7419,7 +7446,7 @@ buttons.create = {
     formOptions: {},
     formTitle: null,
     text(dt, node, config) {
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         return dt.i18n('buttons.create', editor && editor.s
             ? editor.i18n(null, 'create.button')
             : defaults$1.i18n.create.button);
@@ -7427,7 +7454,7 @@ buttons.create = {
 };
 buttons.createInline = {
     action(e, dt, node, config) {
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         editor.inlineCreate(config.position, config.formOptions);
     },
     className: 'buttons-create',
@@ -7443,7 +7470,7 @@ buttons.createInline = {
     formOptions: {},
     position: 'start',
     text(dt, node, config) {
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         return dt.i18n('buttons.create', editor && editor.s
             ? editor.i18n(null, 'create.button')
             : defaults$1.i18n.create.button);
@@ -7452,7 +7479,7 @@ buttons.createInline = {
 buttons.edit = {
     action(e, dt, node, config) {
         let that = this;
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         let rows = dt.rows({ selected: true }).indexes();
         let columns = dt.columns({ selected: true }).indexes();
         let cells = dt.cells({ selected: true }).indexes();
@@ -7491,7 +7518,7 @@ buttons.edit = {
     formOptions: {},
     formTitle: null,
     text(dt, node, config) {
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         return dt.i18n('buttons.edit', editor && editor.s
             ? editor.i18n(null, 'edit.button')
             : defaults$1.i18n.edit.button);
@@ -7501,7 +7528,7 @@ buttons.edit = {
 buttons.remove = {
     action(e, dt, node, config) {
         let that = this;
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         this.processing(true);
         editor
             .one('preOpen', function () {
@@ -7540,7 +7567,7 @@ buttons.remove = {
     formTitle: null,
     limitTo: ['rows'],
     text(dt, node, config) {
-        let editor = resolveInst(config);
+        let editor = unwrap(config.editor);
         return dt.i18n('buttons.remove', editor && editor.s
             ? editor.i18n(null, 'remove.button')
             : defaults$1.i18n.remove.button);
@@ -7735,7 +7762,7 @@ class Editor {
             // Resolve this reference in the event handlers so the
             // table() API method can be used to change it and the
             // change still be operated on here.
-            let table = this.s.table;
+            let table = unwrap(this.s.table);
             if (table) {
                 let dtApi = new DataTable.Api(table);
                 if (settings.table === dtApi.table().node()) {
@@ -7746,7 +7773,7 @@ class Editor {
             }
         })
             .on('i18n.dt.dte' + this.s.unique, (e, settings) => {
-            let table = this.s.table;
+            let table = unwrap(this.s.table);
             if (table) {
                 let dtApi = new DataTable.Api(table);
                 if (settings.table === dtApi.table().node()) {
@@ -7758,7 +7785,7 @@ class Editor {
             }
         })
             .on('xhr.dt.dte' + this.s.unique, (e, settings, json) => {
-            let table = this.s.table;
+            let table = unwrap(this.s.table);
             if (table) {
                 let dtApi = new DataTable.Api(table);
                 if (settings.table === dtApi.table().node()) {
