@@ -2385,7 +2385,7 @@ class Field {
             label: Dom
                 .c('label')
                 .classAdd(classes.label)
-                .attr('for', safeDomId(opts.id, '#'))
+                .attr('for', safeDomId(opts.id))
                 .html(opts.label),
             labelInfo: Dom
                 .c('div')
@@ -4432,7 +4432,10 @@ const dataSource$1 = {
         }
     },
     create(fields, data) {
+        console.log('table', this.s.table);
+        debugger;
         let dt = _dtApi(this.s.table);
+        console.log('dt', dt);
         if (!_dtIsSsp(dt, this)) {
             let row = dt.row.add(data);
             // Wait for the draw on complete, otherwise the node won't exist!
