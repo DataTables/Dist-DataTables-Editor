@@ -3988,7 +3988,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-09-11', 'editor');
+    DataTable.plus('2026-09-17', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -5290,7 +5290,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-09-11', 'editor');
+    DataTable.plus('2026-09-17', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6188,7 +6188,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    if (!DataTable.plus('2026-09-11', 'editor')) {
+    if (!DataTable.plus('2026-09-17', 'editor')) {
         error$1('To save using Editor, please set a license key', 24, 'alert');
         return;
     }
@@ -6635,21 +6635,25 @@ function _weakInArray(name, arr) {
 }
 
 let displayed$1 = false;
-const domEls$1 = {
-    background: Dom
-        .c('div')
-        .classAdd('DTED_Envelope_Background')
-        .css('opacity', '0')
-        .append(Dom.c('div')),
-    close: Dom.c('div').classAdd('DTED_Envelope_Close'),
-    content: Dom.c('div'), // Will be replaced with the actual content
-    wrapper: Dom
-        .c('div')
-        .classAdd('DTED DTED_Envelope_Wrapper')
-        .css('opacity', '0')
-        .append(Dom.c('div').classAdd('DTED_Envelope_Shadow'))
-        .append(Dom.c('div').classAdd('DTED_Envelope_Container'))
-};
+let _domEls$1;
+function getEls$1() {
+    if (!_domEls$1) {
+        _domEls$1 = {
+            background: Dom.c('div')
+                .classAdd('DTED_Envelope_Background')
+                .css('opacity', '0')
+                .append(Dom.c('div')),
+            close: Dom.c('div').classAdd('DTED_Envelope_Close'),
+            content: Dom.c('div'), // Will be replaced with the actual content
+            wrapper: Dom.c('div')
+                .classAdd('DTED DTED_Envelope_Wrapper')
+                .css('opacity', '0')
+                .append(Dom.c('div').classAdd('DTED_Envelope_Shadow'))
+                .append(Dom.c('div').classAdd('DTED_Envelope_Container'))
+        };
+    }
+    return _domEls$1;
+}
 function findAttachRow(editor, attach) {
     let dt = new DataTable.Api(editor.s.table);
     // Figure out where we want to put the form display
@@ -6664,27 +6668,29 @@ function findAttachRow(editor, attach) {
     }
 }
 function heightCalc$1(dte) {
+    let domEls = getEls$1();
     // Set the max-height for the form content
-    let header = domEls$1.wrapper.find('div.DTE_Header').height('outer');
-    let footer = domEls$1.wrapper.find('div.DTE_Footer').height('outer');
+    let header = domEls.wrapper.find('div.DTE_Header').height('outer');
+    let footer = domEls.wrapper.find('div.DTE_Footer').height('outer');
     let maxHeight = Dom.w.height() - envelope.conf.windowPadding * 2 - header - footer;
-    domEls$1.wrapper
+    domEls.wrapper
         .find('div.DTE_Body_Content')
         .css('maxHeight', maxHeight + 'px');
     return Dom.s(dte.dom.wrapper).height('outer');
 }
 function hide$1(dte, callback) {
+    let domEls = getEls$1();
     if (!callback) {
         callback = function () { };
     }
     if (displayed$1) {
         // Slide up and then fade out and remove the display elements
-        domEls$1.content.transition({
-            top: -(domEls$1.content.height() + 50) + 'px'
+        domEls.content.transition({
+            top: -(domEls.content.height() + 50) + 'px'
         }, null, null, function () {
             let dis = Dom.s([
-                domEls$1.wrapper.get(0),
-                domEls$1.background.get(0)
+                domEls.wrapper.get(0),
+                domEls.background.get(0)
             ]);
             dis.transition({ opacity: '0' }, null, null, function () {
                 dis.detach();
@@ -6695,44 +6701,46 @@ function hide$1(dte, callback) {
     }
 }
 function init$1() {
-    domEls$1.content = domEls$1.wrapper.find('div.DTED_Envelope_Container');
+    let domEls = getEls$1();
+    domEls.content = domEls.wrapper.find('div.DTED_Envelope_Container');
 }
 function show$1(dte, callback) {
+    let domEls = getEls$1();
     Dom.s('body')
-        .append(domEls$1.background.css({ opacity: '0' }))
-        .append(domEls$1.wrapper.css({ opacity: '0' }));
+        .append(domEls.background.css({ opacity: '0' }))
+        .append(domEls.wrapper.css({ opacity: '0' }));
     // Adjust size for the content
-    domEls$1.content.css('height', 'auto');
+    domEls.content.css('height', 'auto');
     if (!displayed$1) {
         let height = heightCalc$1(dte);
         let targetRow = findAttachRow(dte, envelope.conf.attach);
         let width = targetRow.offsetWidth;
         // Prep the display
-        domEls$1.wrapper.css({
+        domEls.wrapper.css({
             width: width + 'px',
             marginLeft: -(width / 2) + 'px',
             top: Dom.s(targetRow).offset().top + targetRow.offsetHeight + 'px'
         });
-        domEls$1.content.css('top', -1 * height - 20 + 'px');
+        domEls.content.css('top', -1 * height - 20 + 'px');
         // Fade in the background and then lower the content
-        domEls$1.background.transition({ opacity: '1' });
-        domEls$1.wrapper.transition({ opacity: '1' }, null, null, () => {
-            domEls$1.content.transition({ top: '0' });
+        domEls.background.transition({ opacity: '1' });
+        domEls.wrapper.transition({ opacity: '1' }, null, null, () => {
+            domEls.content.transition({ top: '0' });
         });
     }
     // Event handlers
-    domEls$1.close
+    domEls.close
         .attr('title', dte.i18n(null, 'close'))
         .off('click.DTED_Envelope')
         .on('click.DTED_Envelope', function (e) {
         dte.close();
     });
-    domEls$1.background
+    domEls.background
         .off('click.DTED_Envelope')
         .on('click.DTED_Envelope', function (e) {
         dte.background();
     });
-    domEls$1.wrapper
+    domEls.wrapper
         .find('div.DTED_Lightbox_Content_Wrapper')
         .off('click.DTED_Envelope')
         .on('click.DTED_Envelope', function (e) {
@@ -6762,12 +6770,14 @@ const envelope = {
         return envelope;
     },
     node(dte) {
-        return domEls$1.wrapper.get(0);
+        let domEls = getEls$1();
+        return domEls.wrapper.get(0);
     },
     open(dte, append, callback) {
-        domEls$1.content.children().detach();
-        domEls$1.content.append(append);
-        domEls$1.content.append(domEls$1.close);
+        let domEls = getEls$1();
+        domEls.content.children().detach();
+        domEls.content.append(append);
+        domEls.content.append(domEls.close);
         show$1(dte);
     }
 };
@@ -6780,25 +6790,32 @@ function isMobile() {
 let displayed = false;
 let ready = false;
 let scrollTop = 0;
-const domEls = {
-    background: Dom
-        .c('div')
-        .classAdd('DTED_Lightbox_Background')
-        .append(Dom.c('div')),
-    close: Dom.c('div').classAdd('DTED_Lightbox_Close'),
-    content: null,
-    wrapper: Dom
-        .c('div')
-        .classAdd('DTED_Lightbox_Wrapper')
-        .append(Dom
-        .c('div')
-        .classAdd('DTED_Lightbox_Container')
-        .append(Dom
-        .c('div')
-        .classAdd('DTED_Lightbox_Content_Wrapper')
-        .append(Dom.c('div').classAdd('DTED_Lightbox_Content'))))
-};
+let _domEls;
+function getEls() {
+    if (!_domEls) {
+        _domEls = {
+            background: Dom
+                .c('div')
+                .classAdd('DTED_Lightbox_Background')
+                .append(Dom.c('div')),
+            close: Dom.c('div').classAdd('DTED_Lightbox_Close'),
+            content: null,
+            wrapper: Dom
+                .c('div')
+                .classAdd('DTED_Lightbox_Wrapper')
+                .append(Dom
+                .c('div')
+                .classAdd('DTED_Lightbox_Container')
+                .append(Dom
+                .c('div')
+                .classAdd('DTED_Lightbox_Content_Wrapper')
+                .append(Dom.c('div').classAdd('DTED_Lightbox_Content'))))
+        };
+    }
+    return _domEls;
+}
 function heightCalc() {
+    let domEls = getEls();
     let headerFooter = domEls.wrapper.find('div.DTE_Header').height('outer') +
         domEls.wrapper.find('div.DTE_Footer').height('outer');
     if (isMobile()) {
@@ -6815,6 +6832,7 @@ function heightCalc() {
     }
 }
 function hide(dte, callback) {
+    let domEls = getEls();
     if (!callback) {
         callback = function () { };
     }
@@ -6831,6 +6849,7 @@ function hide(dte, callback) {
     Dom.w.off('resize.DTED_Lightbox');
 }
 function init() {
+    let domEls = getEls();
     if (ready) {
         return;
     }
@@ -6840,6 +6859,7 @@ function init() {
     ready = true;
 }
 function show(dte, callback) {
+    let domEls = getEls();
     // Mobiles have very poor position fixed abilities, so we need to know
     // when using mobile A media query isn't good enough
     if (isMobile()) {
@@ -6904,9 +6924,11 @@ const self = {
         return self;
     },
     node(dte) {
+        let domEls = getEls();
         return domEls.wrapper.get(0);
     },
     open(dte, append, callback) {
+        let domEls = getEls();
         let content = domEls.content;
         content.children().detach();
         content.append(append).append(domEls.close);
@@ -7355,6 +7377,11 @@ apiRegister('file()', file);
 apiRegister('files()', files);
 
 const buttons = DataTable.ext.buttons;
+function resolveInst(config) {
+    return typeof config.editor === 'function'
+        ? config.editor()
+        : config.editor;
+}
 /*
  * Add helpful buttons to make life easier
  *
@@ -7365,7 +7392,7 @@ const buttons = DataTable.ext.buttons;
 buttons.create = {
     action(e, dt, node, config) {
         let that = this;
-        let editor = config.editor;
+        let editor = resolveInst(config);
         this.processing(true);
         editor
             .one('preOpen', function () {
@@ -7392,12 +7419,16 @@ buttons.create = {
     formOptions: {},
     formTitle: null,
     text(dt, node, config) {
-        return dt.i18n('buttons.create', config.editor.i18n(null, 'create.button'));
-    },
+        let editor = resolveInst(config);
+        return dt.i18n('buttons.create', editor && editor.s
+            ? editor.i18n(null, 'create.button')
+            : defaults$1.i18n.create.button);
+    }
 };
 buttons.createInline = {
     action(e, dt, node, config) {
-        config.editor.inlineCreate(config.position, config.formOptions);
+        let editor = resolveInst(config);
+        editor.inlineCreate(config.position, config.formOptions);
     },
     className: 'buttons-create',
     editor: null,
@@ -7412,23 +7443,26 @@ buttons.createInline = {
     formOptions: {},
     position: 'start',
     text(dt, node, config) {
-        return dt.i18n('buttons.create', config.editor.i18n(null, 'create.button'));
-    },
+        let editor = resolveInst(config);
+        return dt.i18n('buttons.create', editor && editor.s
+            ? editor.i18n(null, 'create.button')
+            : defaults$1.i18n.create.button);
+    }
 };
 buttons.edit = {
     action(e, dt, node, config) {
         let that = this;
-        let editor = config.editor;
+        let editor = resolveInst(config);
         let rows = dt.rows({ selected: true }).indexes();
         let columns = dt.columns({ selected: true }).indexes();
         let cells = dt.cells({ selected: true }).indexes();
-        let items = columns.length || cells.length ?
-            {
+        let items = columns.length || cells.length
+            ? {
                 cells,
                 columns,
                 rows
-            } :
-            rows;
+            }
+            : rows;
         this.processing(true);
         editor
             .one('preOpen', function () {
@@ -7451,20 +7485,23 @@ buttons.edit = {
         },
         text(editor) {
             return editor.i18n(null, 'edit.submit');
-        },
+        }
     },
     formMessage: null,
     formOptions: {},
     formTitle: null,
     text(dt, node, config) {
-        return dt.i18n('buttons.edit', config.editor.i18n(null, 'edit.button'));
+        let editor = resolveInst(config);
+        return dt.i18n('buttons.edit', editor && editor.s
+            ? editor.i18n(null, 'edit.button')
+            : defaults$1.i18n.edit.button);
     },
     refresh: false
 };
 buttons.remove = {
     action(e, dt, node, config) {
         let that = this;
-        let editor = config.editor;
+        let editor = resolveInst(config);
         this.processing(true);
         editor
             .one('preOpen', function () {
@@ -7487,22 +7524,26 @@ buttons.remove = {
         },
         text(editor) {
             return editor.i18n(null, 'remove.submit');
-        },
+        }
     },
     formMessage(editor, dt) {
         let rows = dt.rows({ selected: true }).indexes();
         let i18n = editor.i18n(null, 'remove');
-        let question = typeof i18n.confirm === 'string' ?
-            i18n.confirm :
-            i18n.confirm[rows.length] ?
-                i18n.confirm[rows.length] : i18n.confirm._;
+        let question = typeof i18n.confirm === 'string'
+            ? i18n.confirm
+            : i18n.confirm[rows.length]
+                ? i18n.confirm[rows.length]
+                : i18n.confirm._;
         return question.replace(/%d/g, rows.length);
     },
     formOptions: {},
     formTitle: null,
     limitTo: ['rows'],
     text(dt, node, config) {
-        return dt.i18n('buttons.remove', config.editor.i18n(null, 'remove.button'));
+        let editor = resolveInst(config);
+        return dt.i18n('buttons.remove', editor && editor.s
+            ? editor.i18n(null, 'remove.button')
+            : defaults$1.i18n.remove.button);
     },
     refresh: false
 };
@@ -7513,8 +7554,8 @@ buttons.editSingle.extend = 'selectedSingle';
 buttons.removeSingle = util.object.assign({}, buttons.remove);
 buttons.removeSingle.extend = 'selectedSingle';
 
-if (!DataTable || !DataTable.versionCheck || !DataTable.versionCheck('3')) {
-    throw new Error('Editor requires DataTables 3 or newer');
+if (!DataTable || !DataTable.versionCheck || !DataTable.versionCheck('3.1')) {
+    throw new Error('Editor requires DataTables 3.1 or newer');
 }
 class Editor {
     /**
@@ -7794,7 +7835,7 @@ if (DataTable.ext.editorFields) {
 }
 DataTable.ext.editorFields = Editor.fieldTypes;
 // Global listener for file information updates via DataTables' Ajax JSON
-Dom.s(document).on('xhr.dt', function (e, ctx, json) {
+Dom.on('xhr.dt', function (e, ctx, json) {
     if (e.namespace !== 'dt') {
         return;
     }
