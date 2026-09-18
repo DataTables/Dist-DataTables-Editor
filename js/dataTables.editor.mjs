@@ -8,7 +8,7 @@ import DataTable, { util, Dom } from 'datatables.net';
  * Unwrap a reference from React, Vue, Angular, or just a plain value.
  *
  * @param val The value to check if it is a reference.
- * @returns
+ * @returns Unwrapped value
  */
 function unwrap(val) {
     // Allow functions for dynamic resolution
@@ -19,7 +19,14 @@ function unwrap(val) {
     if (typeof val === 'object') {
         // React refs: { current: instance }
         if ('current' in val) {
-            return val.current;
+            // The React DataTables component has the DT api instance in a `dt`
+            // property
+            // return val.current;
+            return val.current &&
+                val.current.dt &&
+                typeof val.current.dt === 'function'
+                ? val.current.dt()
+                : val.current;
         }
         // Vue 3 refs / Preact Signals: { value: instance }
         if ('value' in val) {
@@ -3978,7 +3985,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-09-17', 'editor');
+    DataTable.plus('2026-09-18', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -4256,14 +4263,12 @@ const dataSource$2 = {
 let _dtIsSsp = function (dt, editor) {
     // If the draw type is `none`, then we still need to use the DT API to
     // update the display with the new data
-    return dt.settings()[0].features.serverSide &&
-        editor.s.editOpts.drawType !== 'none';
+    return (dt.settings()[0].features.serverSide &&
+        editor.s.editOpts.drawType !== 'none');
 };
 let _dtApi = function (table) {
     let t = unwrap(table);
-    return t instanceof DataTable.Api
-        ? t
-        : new DataTable.Api(t);
+    return t instanceof DataTable.Api ? t : new DataTable.Api(t);
 };
 // Highlight a row using CSS transitions. The timeouts need to match the
 // transition duration from the CSS
@@ -4280,7 +4285,9 @@ let _dtHighlight = function (node) {
     }, 20);
 };
 let _dtRowSelector = function (out, dt, identifier, fields, idFn) {
-    dt.rows(identifier).indexes().each(function (idx) {
+    dt.rows(identifier)
+        .indexes()
+        .each(function (idx) {
         let row = dt.row(idx);
         let data = row.data();
         let idSrc = idFn(data);
@@ -4298,9 +4305,7 @@ let _dtRowSelector = function (out, dt, identifier, fields, idFn) {
 };
 let _dtFieldsFromIdx = function (dt, fields, idx, ignoreUnknown) {
     let col = dt.settings()[0].columns[idx];
-    let dataSrc = col.editField !== undefined ?
-        col.editField :
-        col.data;
+    let dataSrc = col.editField !== undefined ? col.editField : col.data;
     let resolvedFields = {};
     let run = function (field, dataSrcIn) {
         if (field.name() === dataSrcIn) {
@@ -4329,8 +4334,11 @@ let _dtCellSelector = function (out, dt, identifier, allFields, idFn, forceField
         let row = dt.row(idx.row);
         let data = row.data();
         let idSrc = idFn(data);
-        let fields = forceFields || _dtFieldsFromIdx(dt, allFields, idx.column, cells.count() > 1);
-        let isNode = (typeof identifier === 'object' && identifier.nodeName) || util.is.jquery(identifier) || util.is.dom(identifier);
+        let fields = forceFields ||
+            _dtFieldsFromIdx(dt, allFields, idx.column, cells.count() > 1);
+        let isNode = (typeof identifier === 'object' && identifier.nodeName) ||
+            util.is.jquery(identifier) ||
+            util.is.dom(identifier);
         let prevDisplayFields;
         let prevAttach;
         let prevAttachFields;
@@ -4349,18 +4357,20 @@ let _dtCellSelector = function (out, dt, identifier, allFields, idFn, forceField
             out[idSrc].attachFields = prevAttachFields || [];
             out[idSrc].attachFields.push(Object.keys(fields));
             out[idSrc].attach = prevAttach || [];
-            out[idSrc].attach.push(isNode ?
-                Dom.s(identifier).get(0) :
-                cell.fixedNode ? // If its under a fixed column, get the floating node
-                    cell.fixedNode() :
-                    cell.node());
+            out[idSrc].attach.push(isNode
+                ? Dom.s(identifier).get(0)
+                : cell.fixedNode // If its under a fixed column, get the floating node
+                    ? cell.fixedNode()
+                    : cell.node());
             out[idSrc].displayFields = prevDisplayFields || {};
             util.object.assign(out[idSrc].displayFields, fields);
         }
     });
 };
 let _dtColumnSelector = function (out, dt, identifier, fields, idFn) {
-    dt.cells(null, identifier).indexes().each(function (idx) {
+    dt.cells(null, identifier)
+        .indexes()
+        .each(function (idx) {
         _dtCellSelector(out, dt, idx, fields, idFn);
     });
 };
@@ -4402,8 +4412,7 @@ const dataSource$1 = {
         if (drawType !== 'none') {
             let dtAny = dt;
             // Queue up actions for after the draw
-            dt
-                .one('draw', function () {
+            dt.one('draw', function () {
                 // SSP highlighting has to go after the draw, but this can't be
                 // merged with client-side processing highlight as we want that
                 // to work even when there isn't a draw happening.
@@ -4424,18 +4433,16 @@ const dataSource$1 = {
                     dtAny.searchPanes.rebuildPane(undefined, true);
                 }
                 // Rebuild searchbuilder
-                if (dtAny.searchBuilder !== undefined && typeof dtAny.searchBuilder.rebuild === 'function' && !ssp) {
+                if (dtAny.searchBuilder !== undefined &&
+                    typeof dtAny.searchBuilder.rebuild === 'function' &&
+                    !ssp) {
                     dtAny.searchBuilder.rebuild(dtAny.searchBuilder.getDetails());
                 }
-            })
-                .draw(drawType);
+            }).draw(drawType);
         }
     },
     create(fields, data) {
-        console.log('table', this.s.table);
-        debugger;
         let dt = _dtApi(this.s.table);
-        console.log('dt', dt);
         if (!_dtIsSsp(dt, this)) {
             let row = dt.row.add(data);
             // Wait for the draw on complete, otherwise the node won't exist!
@@ -4516,7 +4523,9 @@ const dataSource$1 = {
             if (dt.page.info().recordsDisplay === 0) {
                 Dom.s(tbody).empty();
             }
-            if (insertPoint === 'start' || insertPoint === null || insertPoint === undefined) {
+            if (insertPoint === 'start' ||
+                insertPoint === null ||
+                insertPoint === undefined) {
                 tr.prependTo(tbody);
             }
             else if (insertPoint === 'end') {
@@ -4559,7 +4568,9 @@ const dataSource$1 = {
         let fields = this.s.fields;
         let out = {};
         if (util.is.plainObject(identifier) &&
-            (identifier.rows !== undefined || identifier.columns !== undefined || identifier.cells !== undefined)) {
+            (identifier.rows !== undefined ||
+                identifier.columns !== undefined ||
+                identifier.cells !== undefined)) {
             // Multi-item type selector
             if (identifier.rows !== undefined) {
                 _dtRowSelector(out, dt, identifier.rows, fields, idFn);
@@ -4611,9 +4622,9 @@ const dataSource$1 = {
             let cancelled = json.cancelled || [];
             store.rowIds = util.object.map(submit.data, function (key, val) {
                 return Object.keys(submit.data[key]).length !== 0 && // was submitted
-                    !cancelled.includes(key) ? // was not cancelled on the server-side
-                    key :
-                    undefined;
+                    !cancelled.includes(key) // was not cancelled on the server-side
+                    ? key
+                    : undefined;
             });
         }
         else if (action === 'remove') {
@@ -4645,7 +4656,7 @@ const dataSource$1 = {
         // If there are rows which are left in `ids` then they weren't updated, and are presumed
         // to have been deleted, and thus should be removed.
         if (ids.length) {
-            dt.rows(ids.map((id) => '#' + id)).remove();
+            dt.rows(ids.map(id => '#' + id)).remove();
         }
     },
     remove(identifier, fields, store) {
@@ -5284,7 +5295,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-09-17', 'editor');
+    DataTable.plus('2026-09-18', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6182,7 +6193,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('2026-09-17', 'editor');
+    DataTable.plus('2026-09-18', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
