@@ -494,6 +494,14 @@ interface IFormOptions {
     title: string | boolean;
 }
 
+type TableTarget = string | HTMLElement | JQuery | Api;
+type FrameworkRef<T> = {
+    readonly current?: T | null;
+} | {
+    readonly value?: T | null;
+} | {
+    readonly nativeElement?: T | null;
+} | (() => T | null | undefined);
 interface IEditorOptions {
     /**
      * Parameter name to use to submit data to the server.
@@ -564,11 +572,12 @@ interface IEditorOptions {
     };
     /**
      * Internationalisation options for Editor. All client-side strings that the
-     * end user can see in the interface presented by Editor can be modified here.
+     * end user can see in the interface presented by Editor can be modified
+     * here.
      *
-     * You may also wish to refer to the <a href="http://datatables.net/usage/i18n">
-     * DataTables internationalisation options</a> to provide a fully language
-     * customised table interface.
+     * You may also wish to refer to the <a
+     * href="http://datatables.net/usage/i18n"> DataTables internationalisation
+     * options</a> to provide a fully language customised table interface.
      */
     i18n: {
         /**
@@ -576,8 +585,8 @@ interface IEditorOptions {
          */
         close: string;
         /**
-         * Strings used when working with the Editor 'create' action (creating new
-         * records).
+         * Strings used when working with the Editor 'create' action (creating
+         * new records).
          */
         create: {
             /**
@@ -618,8 +627,8 @@ interface IEditorOptions {
             weekdays: [string, string, string, string, string, string, string];
         };
         /**
-         * Strings used when working with the Editor 'edit' action (editing existing
-         * records).
+         * Strings used when working with the Editor 'edit' action (editing
+         * existing records).
          */
         edit: {
             /**
@@ -695,7 +704,8 @@ interface IEditorOptions {
              */
             restore: string;
             /**
-             * Shown in place of the field value when a field has multiple values
+             * Shown in place of the field value when a field has multiple
+             * values
              */
             title: string;
         };
@@ -711,14 +721,14 @@ interface IEditorOptions {
             /**
              * Deletion confirmation message.
              *
-             * As Editor has the ability to delete either a single or multiple rows
-             * at a time, this option can be given as either a string (which will be
-             * used regardless of how many records are selected) or as an object
-             * where the property "_" will be used (with %d substituted for the number
-             * of records to be deleted) as the delete message, unless there is a
-             * key with the number of records to be deleted. This allows Editor
-             * to consider the different pluralisation characteristics of different
-             * languages.
+             * As Editor has the ability to delete either a single or multiple
+             * rows at a time, this option can be given as either a string
+             * (which will be used regardless of how many records are selected)
+             * or as an object where the property "_" will be used (with %d
+             * substituted for the number of records to be deleted) as the
+             * delete message, unless there is a key with the number of records
+             * to be deleted. This allows Editor to consider the different
+             * pluralisation characteristics of different languages.
              *
              */
             confirm: {
@@ -742,19 +752,16 @@ interface IEditorOptions {
      */
     idSrc: string;
     /**
-     * jQuery selector that can be used to identify the table you wish to apply
-     * this editor instance to.
-     *
-     * In previous versions of Editor (1.2 and earlier), this parameter was
-     * called `table`. The name has been altered in 1.3+ to simplify the
-     * initialisation. This is a backwards compatible change - if you pass in
-     * a `table` option it will be used.
+     * Property used to identify the table you wish to apply this editor
+     * instance to. This is typically a string selector for the source table's
+     * id, but it can also be an API instance, or a reference to the table if
+     * you are using React, Vue or Angular.
      */
-    table: string | HTMLElement | JQuery | Api;
+    table: TableTarget | FrameworkRef<TableTarget>;
     /**
-     * A jQuery selector or reference to the element that should be used as the form
-     * template. Only a single element should be selected, so it is most common to
-     * use an ID selector here.
+     * A CSS selector or reference to the element that should be used as the
+     * form template. Only a single element should be selected, so it is most
+     * common to use an ID selector here.
      */
     template: string | HTMLElement | JQuery;
 }

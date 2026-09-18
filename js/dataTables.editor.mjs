@@ -2259,7 +2259,7 @@ var defaults$1 = {
             previous: 'Previous',
             seconds: 'Second',
             unknown: '-',
-            weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+            weekdays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
         },
         edit: {
             button: 'Edit',
@@ -2311,7 +2311,7 @@ var defaults$1 = {
                 _: 'Are you sure you wish to delete %d rows?'
             },
             submit: 'Delete',
-            title: 'Delete',
+            title: 'Delete'
         }
     },
     idSrc: 'DT_RowId',
