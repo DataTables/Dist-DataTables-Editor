@@ -34,8 +34,8 @@
         ".": {
             "types": "./types/types.d.ts",
             "import": "./js/dataTables.editor.mjs",
-            "default": "./js/dataTables.editor.mjs",
-            "require": "./js/dataTables.editor.js"
+            "require": "./js/dataTables.editor.js",
+            "default": "./js/dataTables.editor.mjs"
         },
         "./js/*": "./js/*",
         "./package.json": "./package.json"
