@@ -1,4 +1,4 @@
-/*! Editor 3.1.0 for DataTables
+/*! Editor 3.1.1 for DataTables
  * Copyright (c) SpryMedia Ltd - https://datatables.net/license/plus
  */
 
@@ -4025,7 +4025,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-09-22', 'editor');
+    DataTable.plus('2026-09-25', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -5335,7 +5335,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-09-22', 'editor');
+    DataTable.plus('2026-09-25', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6233,7 +6233,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('2026-09-22', 'editor');
+    DataTable.plus('2026-09-25', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
@@ -7838,7 +7838,7 @@ class Editor {
 }
 Editor.fieldTypes = fieldTypes;
 Editor.files = files$1;
-Editor.version = '3.1.0';
+Editor.version = '3.1.1';
 Editor.classes = classNames;
 Editor.Field = Field;
 Editor.DateTime = null;
