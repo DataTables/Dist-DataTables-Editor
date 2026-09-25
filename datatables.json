@@ -10,6 +10,6 @@
         "types/types.d.ts"
     ],
     "src-repo": "http://github.com/DataTables/Editor",
-    "last-tag": "3.1.0",
+    "last-tag": "3.1.1",
     "last-sync": "1d543639c0dab64941b6379a36ae17ed92111571"
 }
