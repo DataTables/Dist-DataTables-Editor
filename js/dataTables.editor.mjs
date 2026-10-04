@@ -2385,8 +2385,8 @@ class Field {
                 opts.className
             ]),
             fieldError: Dom.c('div').classAdd(classes['msg-error']),
-            fieldInfo: Dom.c('div').classAdd(classes['msg-info']).html(opts.fieldInfo),
-            fieldMessage: Dom.c('div').classAdd(classes['msg-message']).html(opts.message),
+            fieldInfo: Dom.c('div').classAdd(classes['msg-info']),
+            fieldMessage: Dom.c('div').classAdd(classes['msg-message']),
             inputContainer: Dom.c('div').classAdd(classes.input),
             inputControl: Dom.c('div').classAdd(classes.inputControl),
             label: Dom
@@ -2396,8 +2396,7 @@ class Field {
                 .html(opts.label),
             labelInfo: Dom
                 .c('div')
-                .classAdd(classes['msg-label'])
-                .html(opts.labelInfo),
+                .classAdd(classes['msg-label']),
             multi: Dom.c('div').classAdd(classes.multiValue),
             multiInfo: Dom.c('span').classAdd(classes.multiInfo).html(multiI18n.info),
             multiTitle: Dom.c('span').html(multiI18n.title),
@@ -2432,6 +2431,16 @@ class Field {
             // Hidden field, so nothing to have a link to
             that.dom.container.css('display', 'none');
             that.dom.container.find('label').attrRemove('for');
+        }
+        // Initial messages, if there are any
+        if (opts.fieldInfo) {
+            this.fieldInfo(opts.fieldInfo);
+        }
+        if (opts.message) {
+            this.message(opts.message);
+        }
+        if (opts.labelInfo) {
+            this.labelInfo(opts.labelInfo);
         }
         // On click - set a common value for the field
         this.dom.multi.on('click', function () {
@@ -3985,7 +3994,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-09-25', 'editor');
+    DataTable.plus('2026-10-04', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -5295,7 +5304,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-09-25', 'editor');
+    DataTable.plus('2026-10-04', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6193,7 +6202,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('2026-09-25', 'editor');
+    DataTable.plus('2026-10-04', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
