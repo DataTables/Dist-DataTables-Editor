@@ -16,7 +16,7 @@ function unwrap(val) {
         return val();
     }
     // Unwrap references
-    if (typeof val === 'object') {
+    if (val && typeof val === 'object') {
         // React refs: { current: instance }
         if ('current' in val) {
             // The React DataTables component has the DT api instance in a `dt`
@@ -2825,27 +2825,37 @@ class Field {
             let editor = this.s.host;
             msg = msg(editor, new DataTable.Api(editor.internalSettings().table));
         }
+        let show = (elem, item) => {
+            if (DataTable.util.is.dom(item) ||
+                DataTable.util.is.element(item)) {
+                elem.empty().append(item);
+            }
+            else {
+                elem.html(item);
+            }
+        };
         if (el.parent().isVisible()) {
             if (msg) {
                 if (el.isVisible()) {
-                    el.html(msg);
+                    show(el, msg);
                 }
                 else {
-                    el.html(msg).css('display', 'block');
+                    show(el, msg);
+                    el.css('display', 'block');
                     slideDown(el, fn || (() => { }), 2);
                 }
             }
             else {
                 slideUp(el, fn || (() => {
-                    el.html(msg).css('display', 'none');
+                    show(el, msg);
+                    el.css('display', 'none');
                 }));
             }
         }
         else {
             // Not visible, so immediately set, or blank out the element
-            el
-                .html(msg || '')
-                .css('display', msg ? 'block' : 'none');
+            show(el, msg || '');
+            el.css('display', msg ? 'block' : 'none');
             if (fn) {
                 fn();
             }
@@ -3994,7 +4004,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-10-04', 'editor');
+    DataTable.plus('2026-10-15', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -5304,7 +5314,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-10-04', 'editor');
+    DataTable.plus('2026-10-15', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6202,7 +6212,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('2026-10-04', 'editor');
+    DataTable.plus('2026-10-15', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
