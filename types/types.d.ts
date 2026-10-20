@@ -767,7 +767,7 @@ interface IEditorOptions {
 }
 declare const _default$1: IEditorOptions;
 
-type IMode = null | 'bubble' | 'inline' | 'main';
+type IMode = null | 'create' | 'read' | 'edit' | 'remove';
 type IDisplay = false | 'bubble' | 'inline' | 'main';
 type IBubbleLocation = 'auto' | 'top' | 'bottom';
 type IDataSource = 'ajax' | 'html' | 'table';
@@ -786,10 +786,10 @@ interface EventFunction extends Function {
  */
 interface ISettings {
     /**
-     * The current form action - 'create', 'edit' or 'remove'. If no current action then
-     * it is set to null.
+     * The current form action - 'create', 'edit' or 'remove'. If no current
+     * action then it is set to null.
      */
-    action: null | 'create' | 'read' | 'edit' | 'remove';
+    action: IMode;
     /** Name of the parameter used to indicate what action Editor is performing */
     actionName: string;
     ajax: string | AjaxOptions | Function;
@@ -2024,13 +2024,13 @@ declare function _nestedOpen(this: Editor, cb: () => void, nest: boolean): void;
  * form has been configured and displayed. This is to ensure all fire the same
  * events.
  *
- * @param  {string} type Editing type
- * @param  {boolean} immediate indicate if the open is immediate (in which case
+ * @param type Editing type
+ * @param  immediate indicate if the open is immediate (in which case
  * `opened` is also triggered).
- * @return {boolean} `true`
+ * @return `true`
  * @private
  */
-declare function _postopen(this: Editor, type: any, immediate: any): boolean;
+declare function _postopen(this: Editor, type: IDisplay, immediate: boolean): boolean;
 /**
  * Common display editing form method called by all editing methods before the
  * form has been configured and displayed. This is to ensure all fire the same

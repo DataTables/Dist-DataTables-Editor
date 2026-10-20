@@ -1144,8 +1144,8 @@ const autocomplete = util.object.assignDeep({}, baseFieldType, {
         });
         // When model editing, it needs to be attached to the model to allow for focus capture,
         // otherwise the dropdown is attached to the body (inline and bubble).
-        this.on('open', (e, mode, action) => {
-            conf._dropdown.attachTo(mode === 'main' && !autocomplete.dropDownBody
+        this.on('open', (e, type, action) => {
+            conf._dropdown.attachTo(type === 'main' && !autocomplete.dropDownBody
                 ? this.s.displayController.node()
                 : 'body');
         });
@@ -1896,8 +1896,8 @@ const tags = {
         });
         // When model editing, it needs to be attached to the model to allow for focus capture,
         // otherwise the dropdown is attached to the body (inline and bubble).
-        this.on('open', (e, mode, action) => {
-            conf._dropdown.attachTo(mode === 'main' && !tags.dropDownBody
+        this.on('open', (e, type, action) => {
+            conf._dropdown.attachTo(type === 'main' && !tags.dropDownBody
                 ? this.s.displayController.node()
                 : 'body');
         });
@@ -3443,7 +3443,7 @@ function create(arg1, arg2, arg3, arg4) {
         };
     }
     let argOpts = this._crudArgs(arg1, arg2, arg3, arg4);
-    this.s.mode = 'main';
+    this.s.mode = 'create';
     this.s.action = 'create';
     this.s.modifier = null;
     this.dom.form.style.display = 'block';
@@ -3908,7 +3908,7 @@ function inlineCreate(insertPoint, opts) {
         fieldIn.multiReset();
         fieldIn.multiSet(0, fieldIn.def());
     });
-    this.s.mode = 'main';
+    this.s.mode = 'create';
     this.s.action = 'create';
     this.s.modifier = null;
     this.s.editFields = this._dataSource('fakeRow', insertPoint);
@@ -4044,7 +4044,7 @@ function one(name, fn) {
  * @returns Editor instance
  */
 function open() {
-    DataTable.plus('2026-10-15', 'editor');
+    DataTable.plus('2026-10-20', 'editor');
     // Insert the display elements in order
     this._displayReorder();
     // Define how to do a close
@@ -4395,7 +4395,7 @@ let _dtCellSelector = function (out, dt, identifier, allFields, idFn, forceField
         let idSrc = idFn(data);
         let fields = forceFields ||
             _dtFieldsFromIdx(dt, allFields, idx.column, cells.count() > 1);
-        let isNode = (typeof identifier === 'object' && identifier.nodeName) ||
+        let isNode = (identifier && typeof identifier === 'object' && identifier.nodeName) ||
             util.is.jquery(identifier) ||
             util.is.dom(identifier);
         let prevDisplayFields;
@@ -5282,7 +5282,7 @@ function _displayReorder(includeFields) {
     let fields = this.s.fields;
     let order = this.s.order;
     let template = this.s.template;
-    let mode = this.s.mode || 'main';
+    let display = this.s.displayed || 'main';
     if (includeFields) {
         this.s.includeFields = includeFields;
     }
@@ -5293,7 +5293,7 @@ function _displayReorder(includeFields) {
     formContent.children().detach();
     order.forEach(name => {
         if (this._weakInArray(name, includeFields) !== -1) {
-            if (template && mode === 'main') {
+            if (template && display === 'main') {
                 // Tag based templates - insert after the custom element
                 let tag = template.find('editor-field[name="' + name + '"]');
                 if (tag.count()) {
@@ -5310,7 +5310,7 @@ function _displayReorder(includeFields) {
             }
         }
     });
-    if (template && template.count() && mode === 'main') {
+    if (template && template.count() && display === 'main') {
         template.appendTo(formContent);
     }
     this._event('displayOrder', [this.s.displayed, this.s.action, formContent]);
@@ -5354,7 +5354,7 @@ function _edit(items, editFields, type, formOptions, setupDone) {
     let usedFields = [];
     let includeInOrder;
     let editData = {};
-    DataTable.plus('2026-10-15', 'editor');
+    DataTable.plus('2026-10-20', 'editor');
     this.s.editFields = editFields;
     this.s.editData = editData;
     this.s.modifier = items;
@@ -6081,10 +6081,10 @@ function _nestedOpen(cb, nest) {
  * form has been configured and displayed. This is to ensure all fire the same
  * events.
  *
- * @param  {string} type Editing type
- * @param  {boolean} immediate indicate if the open is immediate (in which case
+ * @param type Editing type
+ * @param  immediate indicate if the open is immediate (in which case
  * `opened` is also triggered).
- * @return {boolean} `true`
+ * @return `true`
  * @private
  */
 function _postopen(type, immediate) {
@@ -6137,7 +6137,7 @@ function _preopen(type) {
         // inline and bubble methods cannot be opened using `open()`, they
         // have to be called again, so we need to clean up the event
         // listener added by _formOptions
-        if ((this.s.mode === 'inline' || this.s.mode === 'bubble') &&
+        if ((this.s.displayed === 'inline' || this.s.displayed === 'bubble') &&
             this.s.closeIcb) {
             this.s.closeIcb();
         }
@@ -6252,7 +6252,7 @@ function _submit(successCallback, errorCallback, formatdata, hide) {
     let opts = this.s.editOpts;
     let changedSubmit = opts.submit;
     let submitParamsLocal;
-    DataTable.plus('2026-10-15', 'editor');
+    DataTable.plus('2026-10-20', 'editor');
     // First - are any of the fields currently "processing"? If so, then we
     // want to let them complete before submitting
     if (this._noProcessing(arguments) === false) {
@@ -6392,7 +6392,7 @@ function _submitTable(data, success, error) {
     let idSet = dataSet(this.s.idSrc);
     // Nothing required for remove - create and edit get a copy of the data
     if (action !== 'remove') {
-        let originalData = this.s.mode === 'main'
+        let originalData = this.s.displayed === 'main'
             ? this._dataSource('fields', this.modifier())
             : this._dataSource('individual', this.modifier());
         util.object.each(data.data, function (key, vals) {
